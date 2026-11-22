@@ -16,7 +16,7 @@ const (
 	toName      = "to"
 	allMail     = "All Mail"
 	specialHint = "name the mailbox with `mailslot move --to <mailbox>`"
-	gmailHint   = "Gmail archives by removing the Inbox label, which Mail's scripting cannot do; a move to All Mail leaves the message in Inbox, so archive it in Gmail or in Mail itself"
+	gmailHint   = "an account with All Mail is Gmail, which archives by removing the Inbox label; Mail's scripting cannot do that, so archive in Gmail or Mail itself. On another provider, name the mailbox with `mailslot move --to <mailbox>`"
 )
 
 // destination picks the mailbox a relocating command moves messages into.
@@ -86,15 +86,15 @@ func (app *application) special(role mail.Special) destination {
 		if err != nil {
 			return "", err
 		}
+		missing := fmt.Sprintf("found no %s mailbox in account %q", strings.ToLower(string(role)), account.Name)
+		if role == mail.Archive && slices.ContainsFunc(mailboxes, func(mailbox mail.Mailbox) bool {
+			return strings.EqualFold(mailbox.Name[strings.LastIndex(mailbox.Name, "/")+1:], allMail)
+		}) {
+			return "", failure.New(failure.NotFound, missing, gmailHint)
+		}
 		name, found := role.Find(mailboxes)
 		if !found {
-			hint := specialHint
-			if role == mail.Archive && slices.ContainsFunc(mailboxes, func(mailbox mail.Mailbox) bool {
-				return strings.EqualFold(mailbox.Name[strings.LastIndex(mailbox.Name, "/")+1:], allMail)
-			}) {
-				hint = gmailHint
-			}
-			return "", failure.New(failure.NotFound, fmt.Sprintf("found no %s mailbox in account %q", strings.ToLower(string(role)), account.Name), hint)
+			return "", failure.New(failure.NotFound, missing, specialHint)
 		}
 		return name, nil
 	}

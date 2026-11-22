@@ -213,7 +213,7 @@ func TestArchiveWork(t *testing.T) {
 func TestArchivePersonalRefusesAllMail(t *testing.T) {
 	outcome := execute(t, "-a", "Personal", "archive", "1017")
 	triageExpectCode(t, outcome, 4)
-	if !strings.Contains(outcome.Stderr, "Gmail archives by removing the Inbox label") {
+	if !strings.Contains(outcome.Stderr, "All Mail is Gmail") {
 		t.Fatalf("archive on a Gmail account lacks the Gmail hint:\n%s", outcome.Stderr)
 	}
 }
