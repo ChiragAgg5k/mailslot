@@ -16,6 +16,15 @@ func PermissionDenied() *failure.Error {
 	)
 }
 
+// AccessibilityDenied reports that macOS refused this process control of other apps' menus, which `archive --gui` needs.
+func AccessibilityDenied() *failure.Error {
+	return failure.New(
+		failure.Permission,
+		"the app running this command is not allowed to click Mail's menus",
+		"allow it under System Settings → Privacy & Security → Accessibility",
+	)
+}
+
 // Unanswered reports that Mail gave no reply within the timeout.
 func Unanswered(timeout time.Duration) *failure.Error {
 	return failure.New(

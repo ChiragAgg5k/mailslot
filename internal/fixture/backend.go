@@ -22,6 +22,7 @@ const Version = "fixture"
 
 const (
 	drafts        = "Drafts"
+	allMail       = "All Mail"
 	signatureMark = "\n\n"
 	sentDomain    = "fixture.example.com"
 )
@@ -330,6 +331,29 @@ func (backend *Backend) Flag(ctx context.Context, target mail.Target, color mail
 // Move moves the targeted message to another mailbox of its account, where it gets a new id as in Mail.
 func (backend *Backend) Move(ctx context.Context, target mail.Target, destination string) (mail.Summary, error) {
 	return backend.change(ctx, target, func(store *data, message *record) error {
+		found, err := store.folder(message.Account, destination)
+		if err != nil {
+			return err
+		}
+		message.ID = store.nextID()
+		message.Mailbox = found.Name
+		return nil
+	})
+}
+
+// Archive stands in for Mail's Archive command by moving the message to its account's archive
+// mailbox, or to All Mail where Gmail keeps archived mail.
+func (backend *Backend) Archive(ctx context.Context, target mail.Target) (mail.Summary, error) {
+	return backend.change(ctx, target, func(store *data, message *record) error {
+		destination := allMail
+		owned := store.folders(message.Account)
+		mailboxes := make([]mail.Mailbox, 0, len(owned))
+		for _, candidate := range owned {
+			mailboxes = append(mailboxes, mail.Mailbox{Name: candidate.Name})
+		}
+		if name, found := mail.Archive.Find(mailboxes); found {
+			destination = name
+		}
 		found, err := store.folder(message.Account, destination)
 		if err != nil {
 			return err

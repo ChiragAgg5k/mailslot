@@ -1,6 +1,9 @@
 package mail
 
-import "context"
+import (
+	"context"
+	"os/exec"
+)
 
 // Resolve finds the message a target names and reports where it was found.
 func (client Client) Resolve(ctx context.Context, target Target) (Summary, error) {
@@ -36,5 +39,20 @@ func (client Client) Move(ctx context.Context, target Target, destination string
 		Target
 		Destination string `json:"destination"`
 	}{target, destination}, &summary)
+	return summary, err
+}
+
+// Archive clicks Mail's Archive command on a message, keeping the display awake meanwhile, since a
+// sleeping display locks the screen and greys the command out.
+func (client Client) Archive(ctx context.Context, target Target) (Summary, error) {
+	awake := exec.CommandContext(ctx, "caffeinate", "-d")
+	if awake.Start() == nil {
+		defer func() {
+			_ = awake.Process.Kill()
+			_ = awake.Wait()
+		}()
+	}
+	var summary Summary
+	err := client.run(ctx, archiveScript, target, target, &summary)
 	return summary, err
 }

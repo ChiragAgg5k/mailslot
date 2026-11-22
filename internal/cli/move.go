@@ -16,7 +16,7 @@ const (
 	toName      = "to"
 	allMail     = "All Mail"
 	specialHint = "name the mailbox with `mailslot move --to <mailbox>`"
-	gmailHint   = "an account with All Mail is Gmail, which archives by removing the Inbox label; Mail's scripting cannot do that, so archive in Gmail or Mail itself. On another provider, name the mailbox with `mailslot move --to <mailbox>`"
+	gmailHint   = "an account with All Mail is Gmail, which archives by removing the Inbox label; a move cannot do that, so use `mailslot archive --gui` to run Mail's own Archive command. On another provider, name the mailbox with `mailslot move --to <mailbox>`"
 )
 
 // destination picks the mailbox a relocating command moves messages into.

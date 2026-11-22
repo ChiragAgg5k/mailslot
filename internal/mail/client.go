@@ -40,6 +40,7 @@ const (
 	markScript        script = "mark"
 	flagScript        script = "flag"
 	moveScript        script = "move"
+	archiveScript     script = "archive"
 	composeScript     script = "compose"
 	checkScript       script = "check"
 )
@@ -58,6 +59,7 @@ const (
 // Apple event error numbers, from AppleEvents.h and MacErrors.h.
 const (
 	notPermitted      = -1743
+	notAssistive      = -25211
 	timedOut          = -1712
 	missingObject     = -1728
 	applicationAbsent = -600
@@ -169,6 +171,8 @@ func classify(problem fault, target Target, timeout time.Duration) error {
 	switch {
 	case problem.Number == notPermitted:
 		return PermissionDenied()
+	case problem.Number == notAssistive:
+		return AccessibilityDenied()
 	case problem.Number == timedOut:
 		return Unanswered(timeout)
 	case problem.Kind == messageKind:
