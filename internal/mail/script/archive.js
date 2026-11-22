@@ -4,6 +4,7 @@
 // clicks that menu item through System Events. That needs Accessibility, an unlocked
 // screen and Mail on the current desktop, and the menu names are Mail's English ones.
 const archiveSystemEvents = Application('System Events');
+const archiveGmail = /(^|\.)(gmail|googlemail)\.com$/i;
 const archiveUnavailable =
   "Mail's Archive command is unavailable; unlock the screen, keep Mail on the current desktop and leave the Mac alone while it runs";
 
@@ -13,12 +14,17 @@ function archiveMenuItem() {
   return mail.menuBars[0].menuBarItems.byName('Message').menus[0].menuItems.byName('Archive');
 }
 
+function archiveGmailAllMail(request, mailbox) {
+  if (request.account === preludeLocal || preludeLeaf(mailbox).toLowerCase() !== 'all mail') return false;
+  return archiveGmail.test(String(optional(() => findAccount(request.account).serverName())));
+}
+
 function main(request) {
   const found = findMessage(request);
   const captured = describe(found.message, found.mailbox);
   if (captured.messageId === '') throw refuse('the message has no Message-ID to confirm the archive by');
   // Archive does nothing on Gmail's All Mail copy, so a message found there is archived through its Inbox copy.
-  const inAllMail = preludeLeaf(found.mailbox).toLowerCase() === 'all mail';
+  const inAllMail = archiveGmailAllMail(request, found.mailbox);
   const confirmed = inAllMail ? 'Inbox' : found.mailbox;
   const source = locateMailbox({ account: request.account, mailbox: confirmed }).mailbox;
   let message = found.message;
