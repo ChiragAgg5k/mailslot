@@ -210,11 +210,17 @@ func TestArchiveWork(t *testing.T) {
 	triageExpectCode(t, execute(t, "-a", "Work", "archive", "1011", "-m", "Archive"), 2)
 }
 
-func TestArchivePersonalRefusesAllMail(t *testing.T) {
+func TestArchiveGmail(t *testing.T) {
 	outcome := execute(t, "-a", "Personal", "archive", "1017")
 	triageExpectCode(t, outcome, 4)
 	if !strings.Contains(outcome.Stderr, "All Mail is Gmail") {
 		t.Fatalf("archive on a Gmail account lacks the Gmail hint:\n%s", outcome.Stderr)
+	}
+	if rows := triageRun(t, setup{}, "-a", "Personal", "archive", "1017", "--gui"); len(rows) != 1 || rows[0].Change != "archived" {
+		t.Fatalf("archive --gui reported %+v", rows)
+	}
+	if moved := triageRead(t, setup{}, "-a", "Personal", "book-club-1017@mail.example.org"); moved.Mailbox != "All Mail" {
+		t.Fatalf("1017 is in %s after archive --gui", moved.Mailbox)
 	}
 }
 

@@ -16,7 +16,7 @@ _Every recording in this README runs against invented mail (the [fixture backend
 Yes, if:
 
 - **You have a locked account.** Your university or company blocks third-party mail clients: no consent for outside OAuth apps, and no IMAP, basic authentication or app passwords. Apple Mail is usually still allowed, and `mailslot` only ever talks to Mail.
-- **You want a script or an AI agent to work on your mail without holding credentials.** `mailslot` is Automation-only: the one macOS permission it needs is Automation control of Mail. It needs no Full Disk Access, no Accessibility and no secrets. Writing is draft-first, and two safety switches make `mailslot` refuse to change or send anything.
+- **You want a script or an AI agent to work on your mail without holding credentials.** `mailslot` is Automation-only: the one macOS permission it needs is Automation control of Mail. It needs no Full Disk Access, no Accessibility (except the opt-in `archive --gui`) and no secrets. Writing is draft-first, and two safety switches make `mailslot` refuse to change or send anything.
 
 Use something else if:
 
@@ -122,7 +122,7 @@ mailslot archive 1008 1010 --dry-run
 mailslot delete 1012 -m Archive
 ```
 
-- `archive` moves to the account's archive mailbox (`Archive` or `Archives`). Gmail has none: it archives by removing the Inbox label, which Mail's scripting cannot do.
+- `archive` moves to the account's archive mailbox (`Archive` or `Archives`). Gmail has none: it archives by removing the Inbox label, which no scripting command does. `archive --gui` clicks Mail's own Archive command instead, which works on Gmail but needs Accessibility, an unlocked screen and Mail on the current desktop, and takes over the screen while it runs.
 - `delete` moves to the account's Trash (`Trash`, `Deleted Items`, `Deleted Messages` or `Bin`). Nothing is ever erased: a message already in the Trash is left there with exit code 2, and emptying the Trash is up to you in Mail.
 - `move` only moves between mailboxes of the same account.
 

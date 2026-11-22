@@ -111,6 +111,10 @@ func (queue Queue) Move(ctx context.Context, target Target, destination string) 
 	return queued(queue, ctx, func() (Summary, error) { return queue.Backend.Move(ctx, target, destination) })
 }
 
+func (queue Queue) Archive(ctx context.Context, target Target) (Summary, error) {
+	return queued(queue, ctx, func() (Summary, error) { return queue.Backend.Archive(ctx, target) })
+}
+
 func (queue Queue) Compose(ctx context.Context, draft Draft) (Delivery, error) {
 	return queued(queue, ctx, func() (Delivery, error) { return queue.Backend.Compose(ctx, draft) })
 }

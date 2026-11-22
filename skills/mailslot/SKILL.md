@@ -73,6 +73,7 @@ mailslot reply 1006 -a Work --all --body-file answer.txt --json
 ```sh
 mailslot archive 1008 1010 -a Work --dry-run --json
 mailslot archive 1008 1010 -a Work --json
+mailslot archive 1017 -a Personal --gui --json      # Gmail: clicks Mail's Archive; needs Accessibility and an unlocked screen
 mailslot mark 1009 -a Work --read --json            # or --unread
 mailslot flag 1004 -a Work --color orange --json    # red orange yellow green blue purple gray; --clear removes
 mailslot move 1004 -a Work --to Projects --json     # same account only

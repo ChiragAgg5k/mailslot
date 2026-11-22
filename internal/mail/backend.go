@@ -20,6 +20,8 @@ type Backend interface {
 	Flag(ctx context.Context, target Target, color FlagColor) (Summary, error)
 	// Move returns the message at its destination, with ID 0 when Mail has not assigned the new id yet.
 	Move(ctx context.Context, target Target, destination string) (Summary, error)
+	// Archive runs Mail's own Archive command on a message, which archives Gmail where Move cannot.
+	Archive(ctx context.Context, target Target) (Summary, error)
 	Compose(ctx context.Context, draft Draft) (Delivery, error)
 	// Fetch asks Mail to check for new mail.
 	Fetch(ctx context.Context, account string) error
