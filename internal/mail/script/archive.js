@@ -15,12 +15,18 @@ function archiveMenuItem() {
 
 function main(request) {
   const found = findMessage(request);
-  const message = found.message;
-  // Gmail keeps an archived message in All Mail, so one found there is confirmed by leaving Inbox.
-  const confirmed = preludeLeaf(found.mailbox).toLowerCase() === 'all mail' ? 'Inbox' : found.mailbox;
-  const source = locateMailbox({ account: request.account, mailbox: confirmed }).mailbox;
-  const captured = describe(message, found.mailbox);
+  const captured = describe(found.message, found.mailbox);
   if (captured.messageId === '') throw refuse('the message has no Message-ID to confirm the archive by');
+  // Archive does nothing on Gmail's All Mail copy, so a message found there is archived through its Inbox copy.
+  const inAllMail = preludeLeaf(found.mailbox).toLowerCase() === 'all mail';
+  const confirmed = inAllMail ? 'Inbox' : found.mailbox;
+  const source = locateMailbox({ account: request.account, mailbox: confirmed }).mailbox;
+  let message = found.message;
+  if (inAllMail) {
+    const copies = source.messages.whose({ messageId: captured.messageId })();
+    if (copies.length === 0) return captured;
+    message = copies[0];
+  }
 
   Mail.activate();
   Mail.open(message);
