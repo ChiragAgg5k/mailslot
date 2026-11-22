@@ -210,10 +210,11 @@ func TestArchiveWork(t *testing.T) {
 	triageExpectCode(t, execute(t, "-a", "Work", "archive", "1011", "-m", "Archive"), 2)
 }
 
-func TestArchivePersonalUsesAllMail(t *testing.T) {
-	triageExpectMove(t, triageRun(t, setup{}, "-a", "Personal", "archive", "1017"), "All Mail", 1017)
-	if moved := triageRead(t, setup{}, "-a", "Personal", "book-club-1017@mail.example.org"); moved.Mailbox != "All Mail" {
-		t.Fatalf("1017 is in %s", moved.Mailbox)
+func TestArchivePersonalRefusesAllMail(t *testing.T) {
+	outcome := execute(t, "-a", "Personal", "archive", "1017")
+	triageExpectCode(t, outcome, 4)
+	if !strings.Contains(outcome.Stderr, "Gmail archives by removing the Inbox label") {
+		t.Fatalf("archive on a Gmail account lacks the Gmail hint:\n%s", outcome.Stderr)
 	}
 }
 

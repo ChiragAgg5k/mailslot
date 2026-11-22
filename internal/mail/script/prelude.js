@@ -135,13 +135,15 @@ function preludeWhere(account) {
 
 // Returns the named mailbox with its name spelled the way Mail spells it (INBOX, not
 // the requested Inbox), so every command reports the same name for the same mailbox.
-// A top-level match is taken as Mail lists it, without walking the whole tree.
+// A top-level match is taken as Mail lists it, without walking the whole tree, and is
+// addressed by position: Gmail lists `[Gmail]/All Mail` as `All Mail`, which byName cannot get.
 function locateMailbox(request) {
   const owner = container(request.account);
   const requested = request.mailbox || 'Inbox';
   const wanted = requested.toLowerCase();
-  const direct = preludeNames(owner.mailboxes).find((candidate) => candidate.toLowerCase() === wanted);
-  if (direct !== undefined) return { mailbox: owner.mailboxes.byName(direct), name: direct };
+  const names = preludeNames(owner.mailboxes);
+  const position = names.findIndex((candidate) => candidate.toLowerCase() === wanted);
+  if (position >= 0) return { mailbox: owner.mailboxes[position], name: names[position] };
 
   const entries = preludeEntries(request.account);
   const entry =

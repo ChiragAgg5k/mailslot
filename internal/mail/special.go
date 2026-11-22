@@ -35,7 +35,7 @@ func (special Special) Find(mailboxes []Mailbox) (string, bool) {
 func (special Special) names() []string {
 	switch special {
 	case Archive:
-		return []string{"Archive", "Archives", "All Mail"}
+		return []string{"Archive", "Archives"}
 	case Trash:
 		return []string{"Trash", "Deleted Items", "Deleted Messages", "Bin"}
 	}

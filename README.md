@@ -122,7 +122,7 @@ mailslot archive 1008 1010 --dry-run
 mailslot delete 1012 -m Archive
 ```
 
-- `archive` moves to the account's archive mailbox (`Archive`, `Archives` or `All Mail`).
+- `archive` moves to the account's archive mailbox (`Archive` or `Archives`). Gmail has none: it archives by removing the Inbox label, which Mail's scripting cannot do.
 - `delete` moves to the account's Trash (`Trash`, `Deleted Items`, `Deleted Messages` or `Bin`). Nothing is ever erased: a message already in the Trash is left there with exit code 2, and emptying the Trash is up to you in Mail.
 - `move` only moves between mailboxes of the same account.
 

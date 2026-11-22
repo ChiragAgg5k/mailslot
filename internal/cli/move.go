@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -13,7 +14,9 @@ import (
 
 const (
 	toName      = "to"
+	allMail     = "All Mail"
 	specialHint = "name the mailbox with `mailslot move --to <mailbox>`"
+	gmailHint   = "Gmail archives by removing the Inbox label, which Mail's scripting cannot do; a move to All Mail leaves the message in Inbox, so archive it in Gmail or in Mail itself"
 )
 
 // destination picks the mailbox a relocating command moves messages into.
@@ -85,7 +88,13 @@ func (app *application) special(role mail.Special) destination {
 		}
 		name, found := role.Find(mailboxes)
 		if !found {
-			return "", failure.New(failure.NotFound, fmt.Sprintf("found no %s mailbox in account %q", strings.ToLower(string(role)), account.Name), specialHint)
+			hint := specialHint
+			if role == mail.Archive && slices.ContainsFunc(mailboxes, func(mailbox mail.Mailbox) bool {
+				return strings.EqualFold(mailbox.Name[strings.LastIndex(mailbox.Name, "/")+1:], allMail)
+			}) {
+				hint = gmailHint
+			}
+			return "", failure.New(failure.NotFound, fmt.Sprintf("found no %s mailbox in account %q", strings.ToLower(string(role)), account.Name), hint)
 		}
 		return name, nil
 	}

@@ -84,6 +84,7 @@ func TestReadAndTriage(t *testing.T) {
 			if item.Name == "" || item.Messages < 0 || item.Unread < 0 {
 				t.Errorf("mailbox entry has an empty name or negative counts: %+v", item)
 			}
+			current.run(t, "list", "--mailbox", item.Name, "--limit", "1").expect(t, failure.Success)
 		}
 	})
 
